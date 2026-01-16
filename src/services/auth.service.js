@@ -75,6 +75,9 @@ class AuthService {
 
     try {
       const payload = this.decodeToken(token);
+      console.log('JWT Payload:', payload); // Debug log
+      console.log('Roles from JWT:', payload.roles); // Debug log
+
       return {
         userId: payload.userId,
         username: payload.sub,
@@ -107,19 +110,41 @@ class AuthService {
   // Check if user has specific role
   hasRole(roleName) {
     const roles = this.getRoles();
-    return roles.some(role => role.roleName === roleName);
+    return roles.some(role => {
+      if (typeof role === 'string') {
+        return role === roleName;
+      }
+      return role.roleName === roleName || role.authority === roleName;
+    });
   }
 
   // Check if user has any of the specified roles
   hasAnyRole(roleNames) {
     const roles = this.getRoles();
-    return roles.some(role => roleNames.includes(role.roleName));
+    return roles.some(role => {
+      const roleValue = typeof role === 'string' ? role : (role.roleName || role.authority);
+      return roleNames.includes(roleValue);
+    });
   }
 
   // Get primary role (first role)
   getPrimaryRole() {
     const roles = this.getRoles();
-    return roles.length > 0 ? roles[0].roleName : null;
+    if (roles.length === 0) return null;
+
+    // Handle both object format {roleName: "..."} and string format
+    const firstRole = roles[0];
+    if (typeof firstRole === 'string') {
+      return firstRole;
+    } else if (firstRole && firstRole.roleName) {
+      return firstRole.roleName;
+    } else if (firstRole && firstRole.authority) {
+      // Some JWT tokens use "authority" instead of "roleName"
+      return firstRole.authority;
+    }
+
+    console.warn('Unknown role format:', firstRole);
+    return null;
   }
 
   // Handle API errors
