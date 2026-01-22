@@ -19,6 +19,30 @@
   font-weight: 600;
 }
 
+.nav-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.nav-button {
+  padding: 10px 20px;
+  background: #f5f7fa;
+  color: #333;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.nav-button:hover {
+  background: #e8eaf6;
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
 .logout-button {
   padding: 10px 20px;
   background: #667eea;
@@ -187,6 +211,16 @@
 
   .nav-title {
     font-size: 20px;
+  }
+
+  .nav-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .nav-button,
+  .logout-button {
+    width: 100%;
   }
 
   .dashboard-content {

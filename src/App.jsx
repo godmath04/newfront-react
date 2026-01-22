@@ -4,7 +4,21 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 
-// Import axios interceptor to initialize it
+// Componentes de articulos
+import ArticleList from './components/articles/ArticleList';
+import ArticleCreate from './components/articles/ArticleCreate';
+import ArticleEdit from './components/articles/ArticleEdit';
+import ArticleDetail from './components/articles/ArticleDetail';
+
+// Componentes de aprobaciones
+import ApprovalList from './components/approvals/ApprovalList';
+import ApprovalArticleDetail from './components/approvals/ApprovalArticleDetail';
+
+// Componentes publicos
+import PublicArticleList from './components/public/PublicArticleList';
+import PublicArticleDetail from './components/public/PublicArticleDetail';
+
+// Importar interceptor de axios para inicializarlo
 import './utils/axios.interceptor';
 import './App.css';
 
@@ -13,8 +27,10 @@ function App() {
     <AuthProvider>
       <Router>
         <Routes>
-          {/* Public Routes */}
+          {/* Rutas publicas - Sin autenticacion */}
           <Route path="/login" element={<Login />} />
+          <Route path="/public/articles" element={<PublicArticleList />} />
+          <Route path="/public/articles/:id" element={<PublicArticleDetail />} />
 
           {/* Protected Routes */}
           <Route
@@ -26,39 +42,73 @@ function App() {
             }
           />
 
-          {/* Role-based Protected Routes Examples */}
-          {/*
+          {/* Rutas de articulos - Protegidas */}
           <Route
-            path="/admin"
+            path="/articles"
             element={
-              <ProtectedRoute requiredRoles={['Administrador']}>
-                <AdminPanel />
+              <ProtectedRoute>
+                <ArticleList />
               </ProtectedRoute>
             }
           />
-
           <Route
             path="/articles/create"
             element={
-              <ProtectedRoute requiredRoles={['Reportero']}>
-                <CreateArticle />
+              <ProtectedRoute>
+                <ArticleCreate />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/articles/edit/:id"
+            element={
+              <ProtectedRoute>
+                <ArticleEdit />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/articles/detail/:id"
+            element={
+              <ProtectedRoute>
+                <ArticleDetail />
               </ProtectedRoute>
             }
           />
 
+          {/* Rutas de aprobaciones - Solo para aprobadores */}
           <Route
             path="/approvals"
             element={
               <ProtectedRoute requiredRoles={['Editor', 'Revisor Legal', 'Jefe de Redacción']}>
-                <Approvals />
+                <ApprovalList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/approvals/article/:id"
+            element={
+              <ProtectedRoute requiredRoles={['Editor', 'Revisor Legal', 'Jefe de Redacción']}>
+                <ApprovalArticleDetail />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Rutas de administracion - Solo para administradores */}
+          {/*
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute requiredRoles={['Administrador']}>
+                <UserList />
               </ProtectedRoute>
             }
           />
           */}
 
-          {/* Default redirect */}
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* Redireccion por defecto a la lista publica de articulos */}
+          <Route path="/" element={<Navigate to="/public/articles" replace />} />
+          <Route path="*" element={<Navigate to="/public/articles" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

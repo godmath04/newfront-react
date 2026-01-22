@@ -3,10 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './Dashboard.css';
 
+// Roles de aprobadores
+const APPROVER_ROLES = ['Editor', 'Revisor Legal', 'Jefe de Redacción'];
+
 const Dashboard = () => {
-  const { user, logout, getUserRole } = useAuth();
+  const { user, logout, getUserRole, hasAnyRole } = useAuth();
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState('');
+
+  // Verificar si el usuario es reportero
+  const isReporter = userRole === 'Reportero';
+
+  // Verificar si el usuario es aprobador
+  const isApprover = APPROVER_ROLES.includes(userRole);
+
+  // Verificar si el usuario es administrador
+  const isAdmin = userRole === 'Administrador';
 
   useEffect(() => {
     const role = getUserRole();
@@ -16,6 +28,21 @@ const Dashboard = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  // Navegar a la lista de articulos (solo reporteros)
+  const handleGoToArticles = () => {
+    navigate('/articles');
+  };
+
+  // Navegar a aprobaciones (solo aprobadores)
+  const handleGoToApprovals = () => {
+    navigate('/approvals');
+  };
+
+  // Navegar a administracion de usuarios (solo admin)
+  const handleGoToUsers = () => {
+    navigate('/admin/users');
   };
 
   const getRoleDescription = () => {
@@ -70,9 +97,32 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <nav className="dashboard-nav">
         <h1 className="nav-title">Portal Periodístico</h1>
-        <button onClick={handleLogout} className="logout-button">
-          Cerrar Sesión
-        </button>
+        <div className="nav-actions">
+          {/* Boton para Reporteros */}
+          {isReporter && (
+            <button onClick={handleGoToArticles} className="nav-button">
+              Mis Articulos
+            </button>
+          )}
+
+          {/* Boton para Aprobadores */}
+          {isApprover && (
+            <button onClick={handleGoToApprovals} className="nav-button">
+              Aprobaciones
+            </button>
+          )}
+
+          {/* Boton para Administradores */}
+          {isAdmin && (
+            <button onClick={handleGoToUsers} className="nav-button">
+              Gestionar Usuarios
+            </button>
+          )}
+
+          <button onClick={handleLogout} className="logout-button">
+            Cerrar Sesión
+          </button>
+        </div>
       </nav>
 
       <div className="dashboard-content">
